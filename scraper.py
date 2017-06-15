@@ -13,7 +13,7 @@ def initialize(url,UUID):
     Should be called at the beginning of every scrape run (TODO: perhaps turn this into a decorator pattern)
     Creates the table for the runs metadata, and stores a timestamp, the http response headers, response body, and a SHA-256 hash of the body
     """
-    makeTable()
+    makeTables()
     currentTime = str(datetime.now())
     r = requests.get(url)
     headers = json.dumps(dict(r.headers)) #json-serialized headers
@@ -31,7 +31,7 @@ def initialize(url,UUID):
             """) #Gets the most recent run_id associated w/ the entry we just added
     return current_run_id
 
-def makeTable():
+def makeTables():
     """
     Creates a table in the sqlite db for keeping track of runs
     """
@@ -45,7 +45,20 @@ def makeTable():
                     body_SHA256 TEXT,
                     headers TEXT
                     )""")
+    scraperwiki.sqlite.execute("""
+                    CREATE TABLE IF NOT EXISTS child_urls (
+                    url TEXT UNIQUE NOT NULL,
+                    timestamp TEXT
+                    )""")
 
+def addURL(url):
+    """
+    add a child URL to the database
+    """
+    currentTime = str(datetime.now())
+    payload = {'url':url,\
+            'timestamp':currentTime}
+    scraperwiki.sqlite.save(unique_keys=[],data=payload,table_name='child_urls')
 
 def scrape(url,UUID):
     """
@@ -55,6 +68,9 @@ def scrape(url,UUID):
     or any other connection capable of writing to the local sqlite db named data.sqlite
     """
     run_id = initialize(url,UUID)
+    addURL('http://example.org')
+    addURL('http://example.org')
+    addURL('http://archivers.space')
     return
 
 if __name__ == '__main__':
