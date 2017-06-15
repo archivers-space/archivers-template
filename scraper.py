@@ -68,9 +68,9 @@ def scrape(url,UUID):
     or any other connection capable of writing to the local sqlite db named data.sqlite
     """
     run_id = initialize(url,UUID)
-    addURL('http://example.org')
-    addURL('http://example.org')
-    addURL('http://archivers.space')
+    addURL('http://example.org') #test add a child URL
+    addURL('http://example.org') #adding again doesn't do anything because of UNIQUE
+    addURL('http://archivers.space') #adding a different URL does add an entry though
     return
 
 if __name__ == '__main__':
